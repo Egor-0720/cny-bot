@@ -16,6 +16,8 @@ THRESHOLD = 0.4
 CHECK_INTERVAL = 5
 
 price_history = deque()
+last_alert_global = 0
+first_hit_time = {}
 
 def send(msg):
     try:
@@ -63,15 +65,15 @@ def is_working_hours():
     return start <= now <= end
 
 def monitor():
+    global last_alert_global
+    
     send("📊 Бот CNYRUB_TOM запущен")
     send("⏰ Работает: будни 9:00-18:00")
     send("🎯 Порог: 0.4% | Интервал: 2-15 минут")
     
-    last_alert_global = 0
-    
     while True:
         if is_weekend():
-            time.sleep(86400)
+            time.sleep(3600)
             continue
         
         if not is_working_hours():
@@ -98,8 +100,7 @@ def monitor():
             minutes_int = int(seconds // 60)
             seconds_int = int(seconds % 60)
             
-            msg = f"""{direction} {abs_change:.2f}% за {minutes_int} мин {seconds_int} сек!
-💰 CNYRUB_TOM = {current_price}"""
+            msg = f"{direction} {abs_change:.2f}% за {minutes_int} мин {seconds_int} сек!\n💰 CNYRUB_TOM = {current_price}"
             
             send(msg)
             last_alert_global = current_time
@@ -118,6 +119,8 @@ def http_server():
             self.send_response(200)
             self.end_headers()
             self.wfile.write(b"Bot is running")
+        def log_message(self, format, *args):
+            pass
     server = HTTPServer(('0.0.0.0', 8080), Handler)
     server.serve_forever()
 
