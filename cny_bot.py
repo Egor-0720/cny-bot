@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from datetime import datetime, time as dt_time
 from threading import Thread
 from collections import deque
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 load_dotenv()
 
@@ -73,7 +74,7 @@ def monitor():
     
     while True:
         if is_weekend():
-            time.sleep(3600)
+            time.sleep(86400)
             continue
         
         if not is_working_hours():
@@ -112,18 +113,23 @@ def monitor():
         
         time.sleep(CHECK_INTERVAL)
 
-def http_server():
-    from http.server import HTTPServer, BaseHTTPRequestHandler
-    class Handler(BaseHTTPRequestHandler):
-        def do_GET(self):
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b"Bot is running")
-        def log_message(self, format, *args):
-            pass
-    server = HTTPServer(('0.0.0.0', 8080), Handler)
+# === ВЕБ-СЕРВЕР ДЛЯ RENDER ===
+def run_web_server():
+    port = int(os.environ.get('PORT', 10000))
+    server = HTTPServer(('0.0.0.0', port), Handler)
     server.serve_forever()
 
-thread = Thread(target=http_server, daemon=True)
-thread.start()
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is running")
+    def log_message(self, format, *args):
+        pass
+
+# Запускаем веб-сервер в фоновом потоке
+web_thread = Thread(target=run_web_server, daemon=True)
+web_thread.start()
+
+# === ЗАПУСК БОТА ===
 monitor()
