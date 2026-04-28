@@ -7,6 +7,8 @@ on:
 
     # CNY: Пн-Пт запуск в 8:00–17:55 МСК (UTC: часы 5-14)
     - cron: '*/5 5-14 * * 1-5'
+  
+  workflow_dispatch:
 
 jobs:
   ping:
