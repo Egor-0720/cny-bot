@@ -1,0 +1,27 @@
+name: Render Keep Alive (Wake Up на час раньше)
+
+on:
+  schedule:
+    # MOEX: Пн-Пт запуск в 6:00–8:55 МСК (UTC: часы 3-5)
+    - cron: '*/5 3-5 * * 1-5'
+
+    # CNY: Пн-Пт запуск в 8:00–17:55 МСК (UTC: часы 5-14)
+    - cron: '*/5 5-14 * * 1-5'
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake MOEX
+        run: |
+          for i in {1..3}; do
+            curl -m 60 -s https://moex-bot-l66l.onrender.com/health || true
+            sleep 10
+          done
+
+      - name: Wake CNY
+        run: |
+          for i in {1..3}; do
+            curl -m 60 -s https://cny-bot.onrender.com/health || true
+            sleep 10
+          done
