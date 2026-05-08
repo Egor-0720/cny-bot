@@ -8,4 +8,4 @@ build:
 run:
   persistenceMount: /data
   containerPort: 8000
-  command: python bot.py
+  command: python cny_bot.py
