@@ -7,5 +7,5 @@ build:
   requirementsPath: requirements.txt
 run:
   persistenceMount: /data
-  containerPort: 8000
+  containerPort: 8080
   command: python cny_bot.py
